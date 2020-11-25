@@ -1,0 +1,24 @@
+{
+    "name": "valeraseregin/gendiff-php",
+    "description": "php study project",
+    "type": "library",
+    "license": "MIT",
+    "bin": [
+        "bin/gendiff"
+    ],
+    "autoload": {
+        "psr-4": {
+          "Php\\Package\\": "src",
+          "Php\\Package\\Tests\\": "tests"
+        }
+    },
+    "authors": [
+        {
+            "name": "Valeriy Seregin",
+            "email": "valera-s-38@mail.ru"
+        }
+    ],
+    "require": {
+        "docopt/docopt": "^1.0"
+    }
+}
