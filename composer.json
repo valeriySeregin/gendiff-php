@@ -10,7 +10,10 @@
         "psr-4": {
           "Php\\Package\\": "src",
           "Php\\Package\\Tests\\": "tests"
-        }
+        },
+        "files": [
+            "src/GenDiff.php"
+        ]
     },
     "authors": [
         {

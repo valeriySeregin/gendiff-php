@@ -10,7 +10,9 @@ if (file_exists($autoloadPath1)) {
     require_once $autoloadPath2;
 }
 
-$doc = <<<DOC
+use function App\run;
+
+$doc = <<<DOCOPT
 Compares two configuration files and shows a difference.
 
 Usage:
@@ -23,8 +25,8 @@ Options:
   -v --version               Show version.
   -f <type> --format <type>  Output format [default: pretty]
 
-DOC;
+DOCOPT;
 
-$args = Docopt::handle($doc, array('version'=>'v0.0.2'));
-foreach ($args as $k=>$v)
-    echo $k.': '.json_encode($v).PHP_EOL;
+$args = Docopt::handle($doc, array('version'=>'v0.0.3'));
+$result = run($args);
+print_r($result);
