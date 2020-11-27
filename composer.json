@@ -6,6 +6,9 @@
     "bin": [
         "bin/gendiff"
     ],
+    "scripts": {
+        "test": "phpunit tests"
+    },
     "autoload": {
         "psr-4": {
           "Php\\Package\\": "src",
