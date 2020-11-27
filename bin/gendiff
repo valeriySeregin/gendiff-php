@@ -10,7 +10,7 @@ if (file_exists($autoloadPath1)) {
     require_once $autoloadPath2;
 }
 
-use function App\run;
+use function App\getDiff;
 
 $doc = <<<DOCOPT
 Compares two configuration files and shows a difference.
@@ -27,6 +27,6 @@ Options:
 
 DOCOPT;
 
-$args = Docopt::handle($doc, array('version'=>'v0.0.3'));
-$result = run($args);
-print_r($result);
+$args = Docopt::handle($doc, array('version'=>'v0.1.0'));
+$diff = getDiff($args);
+print_r($diff);
