@@ -4,6 +4,7 @@ namespace App;
 
 use function App\Parsers\JsonParser\parse as parseJson;
 use function App\Parsers\YamlParser\parse as parseYaml;
+use function App\Formatters\Pretty\render as renderInPretty;
 
 const PATH_TO_FIRST_FILE = '<path/to/file1>';
 const PATH_TO_SECOND_FILE = '<path/to/file2>';
@@ -15,7 +16,14 @@ function getDiff($args)
     $secondFilepath = $args[PATH_TO_SECOND_FILE];
 
     $differenceData = getDifferenceData($firstFilepath, $secondFilepath);
-    $filesDifference = render($differenceData);
+
+    $formatters = [
+        'pretty' => fn($data) => renderInPretty($data)
+    ];
+
+    $render = $formatters[$args[FORMAT]];
+
+    $filesDifference = $render($differenceData);
 
     return $filesDifference;
 }
@@ -47,67 +55,6 @@ function getFileContents($filepath)
     }
 
     return file_get_contents($filepath);
-}
-
-function changeInvisibleTypes($value)
-{
-    if (is_bool($value)) {
-        return $value === true ? 'true' : 'false';
-    }
-
-    if (is_null($value)) {
-        return 'null';
-    }
-
-    if (is_string($value) && strlen($value) === 0) {
-        return '';
-    }
-
-    return $value;
-}
-
-function getStrByStatus($node)
-{
-    switch ($node['status']) {
-        case 'added':
-            return "  + {$node['key']}: {$node['value']}";
-        case 'removed':
-            return "  - {$node['key']}: {$node['value']}";
-        case 'unchanged':
-            return "    {$node['key']}: {$node['value']}";
-        case 'changed':
-            return "  - {$node['key']}: {$node['value'][0]}\n  + {$node['key']}: {$node['value'][1]}";
-        default:
-            throw new \Exception('Invalid node status!');
-    }
-}
-
-function render($data)
-{
-    $dataWithChangedBools = array_map(function ($node) {
-        if ($node['status'] === 'changed') {
-            return [
-                'key' => $node['key'],
-                'value' => [
-                    changeInvisibleTypes($node['value'][0]),
-                    changeInvisibleTypes($node['value'][1])
-                ],
-                'status' => $node['status']
-            ];
-        }
-
-        return [
-            'key' => $node['key'],
-            'value' => changeInvisibleTypes($node['value']),
-            'status' => $node['status']
-        ];
-    }, $data);
-
-    $output = array_map(fn($node) => getStrByStatus($node), $dataWithChangedBools);
-
-    $result = ["{", ...$output, "}\n"];
-
-    return implode("\n", $result);
 }
 
 function getFileExtension($filepath)

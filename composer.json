@@ -17,7 +17,8 @@
         "files": [
             "src/GenDiff.php",
             "src/parsers/JsonParser.php",
-            "src/parsers/YamlParser.php"
+            "src/parsers/YamlParser.php",
+            "src/formatters/Pretty.php"
         ]
     },
     "authors": [
