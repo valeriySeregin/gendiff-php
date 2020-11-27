@@ -12,12 +12,14 @@ class GenDiffTest extends TestCase
     {
         $argsWithJsonExt = [
             '<path/to/file1>' => __DIR__ . '/fixtures/before.json',
-            '<path/to/file2>' => __DIR__ . '/fixtures/after.json'
+            '<path/to/file2>' => __DIR__ . '/fixtures/after.json',
+            '--format' => 'pretty'
         ];
 
         $argsWithYamlExt = [
             '<path/to/file1>' => __DIR__ . '/fixtures/before.yaml',
-            '<path/to/file2>' => __DIR__ . '/fixtures/after.yaml'
+            '<path/to/file2>' => __DIR__ . '/fixtures/after.yaml',
+            '--format' => 'pretty'
         ];
 
         $diffForJsonExt = getDiff($argsWithJsonExt);
