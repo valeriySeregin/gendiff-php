@@ -12,10 +12,6 @@ function processUnprintableValues($value)
         return 'null';
     }
 
-    if (is_string($value) && strlen($value) === 0) {
-        return '';
-    }
-
     return $value;
 }
 
