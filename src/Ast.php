@@ -2,7 +2,7 @@
 
 namespace App\Ast;
 
-function processsUnprintableValues($value)
+function processUnprintableValues($value)
 {
     if (is_bool($value)) {
         return $value === true ? 'true' : 'false';
@@ -27,7 +27,7 @@ function generateAst($arrBefore, $arrAfter)
         if (!array_key_exists($key, $arrBefore)) {
             return [
                 'name' => $key,
-                'value' => processsUnprintableValues($arrAfter[$key]),
+                'value' => processUnprintableValues($arrAfter[$key]),
                 'status' => 'added'
             ];
         }
@@ -35,7 +35,7 @@ function generateAst($arrBefore, $arrAfter)
         if (!array_key_exists($key, $arrAfter)) {
             return [
                 'name' => $key,
-                'value' => processsUnprintableValues($arrBefore[$key]),
+                'value' => processUnprintableValues($arrBefore[$key]),
                 'status' => 'removed'
             ];
         }
@@ -54,15 +54,15 @@ function generateAst($arrBefore, $arrAfter)
         if ($arrBefore[$key] === $arrAfter[$key]) {
             return [
                 'name' => $key,
-                'value' => processsUnprintableValues($arrBefore[$key]),
+                'value' => processUnprintableValues($arrBefore[$key]),
                 'status' => 'unchanged'
             ];
         }
 
         return [
             'name' => $key,
-            'oldValue' => processsUnprintableValues($arrBefore[$key]),
-            'newValue' => processsUnprintableValues($arrAfter[$key]),
+            'oldValue' => processUnprintableValues($arrBefore[$key]),
+            'newValue' => processUnprintableValues($arrAfter[$key]),
             'status' => 'changed'
         ];
     }, $unitedKeys);
