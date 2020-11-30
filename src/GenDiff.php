@@ -15,7 +15,7 @@ function getDiff($args)
     $firstFilepath = $args[PATH_TO_FIRST_FILE];
     $secondFilepath = $args[PATH_TO_SECOND_FILE];
 
-    $differenceData = getDifferenceData($firstFilepath, $secondFilepath);
+    $diffAst = getDiffAst($firstFilepath, $secondFilepath);
 
     $formatters = [
         'pretty' => fn($data) => renderInPretty($data)
@@ -23,12 +23,12 @@ function getDiff($args)
 
     $render = $formatters[$args[FORMAT]];
 
-    $filesDifference = $render($differenceData);
+    $diff = $render($diffAst);
 
-    return $filesDifference;
+    return $diff;
 }
 
-function getDifferenceData($firstFilepath, $secondFilepath)
+function getDiffAst($firstFilepath, $secondFilepath)
 {
     $parsers = [
         'json' => fn($json) => parseJson($json),
