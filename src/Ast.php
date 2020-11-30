@@ -40,7 +40,10 @@ function generateAst($arrBefore, $arrAfter)
             ];
         }
 
-        if ((isset($arrBefore[$key]) && is_array($arrBefore[$key])) && (isset($arrAfter[$key]) && is_array($arrAfter[$key]))) {
+        if (
+            (isset($arrBefore[$key]) && is_array($arrBefore[$key]))
+            && (isset($arrAfter[$key]) && is_array($arrAfter[$key]))
+        ) {
             return [
                 'name' => $key,
                 'status' => 'nested',
