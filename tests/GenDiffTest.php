@@ -25,7 +25,7 @@ class GenDiffTest extends TestCase
         $diffForJsonExt = getDiff($argsWithJsonExt);
         $diffForYamlExt = getDiff($argsWithYamlExt);
 
-        $expected = file_get_contents(__DIR__ . '/fixtures/diff.txt');
+        $expected = file_get_contents(__DIR__ . '/fixtures/expectedPretty.txt');
 
         $this->assertEquals($diffForJsonExt, $expected);
         $this->assertEquals($diffForYamlExt, $expected);
