@@ -4,6 +4,7 @@ namespace App;
 
 use function App\Parsers\JsonParser\parse as parseJson;
 use function App\Parsers\YamlParser\parse as parseYaml;
+use function App\Ast\generateAst;
 use function App\Formatters\Pretty\render as renderInPretty;
 
 const PATH_TO_FIRST_FILE = '<path/to/file1>';
@@ -42,9 +43,9 @@ function getDiffAst($firstFilepath, $secondFilepath)
     $firstArr = $parsers[$firstFileExt](getFileContents($firstFilepath));
     $secondArr = $parsers[$secondFileExt](getFileContents($secondFilepath));
 
-    $diff = calculateDiff($firstArr, $secondArr);
+    $ast = generateAst($firstArr, $secondArr);
 
-    return $diff;
+    return $ast;
 }
 
 function getFileContents($filepath)
@@ -62,36 +63,4 @@ function getFileExtension($filepath)
     $pathParts = pathinfo($filepath);
 
     return $pathParts['extension'];
-}
-
-function calculateDiff($firstArr, $secondArr)
-{
-    $unitedKeys = array_keys(array_merge($firstArr, $secondArr));
-
-    return array_map(function ($key) use ($firstArr, $secondArr) {
-        if (array_key_exists($key, $firstArr) && !array_key_exists($key, $secondArr)) {
-            $value = $firstArr[$key];
-            $status = 'removed';
-            return ['key' => $key, 'value' => $value, 'status' => $status];
-        }
-
-        if (!array_key_exists($key, $firstArr) && array_key_exists($key, $secondArr)) {
-            $value = $secondArr[$key];
-            $status = 'added';
-            return ['key' => $key, 'value' => $value, 'status' => $status];
-        }
-
-        if (array_key_exists($key, $firstArr) && array_key_exists($key, $secondArr)) {
-            if ($firstArr[$key] === $secondArr[$key]) {
-                $value = $firstArr[$key];
-                $status = 'unchanged';
-                return ['key' => $key, 'value' => $value, 'status' => $status];
-            } else {
-                $value1 = $firstArr[$key];
-                $value2 = $secondArr[$key];
-                $status = 'changed';
-                return ['key' => $key, 'value' => [$value1, $value2], 'status' => $status];
-            }
-        }
-    }, $unitedKeys);
 }

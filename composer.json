@@ -18,6 +18,7 @@
             "src/GenDiff.php",
             "src/parsers/JsonParser.php",
             "src/parsers/YamlParser.php",
+            "src/Ast.php",
             "src/formatters/Pretty.php"
         ]
     },
