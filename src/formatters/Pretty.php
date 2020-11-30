@@ -2,63 +2,84 @@
 
 namespace App\Formatters\Pretty;
 
-function changeInvisibleTypes($value)
+function getIndent($num)
 {
-    if (is_bool($value)) {
-        return $value === true ? 'true' : 'false';
-    }
-
-    if (is_null($value)) {
-        return 'null';
-    }
-
-    if (is_string($value) && strlen($value) === 0) {
-        return '';
-    }
-
-    return $value;
+    return str_repeat('    ', $num);
 }
 
-function getStrByStatus($node)
+function stringify($value, $depth)
 {
+    if (!is_array($value)) {
+        return $value;
+    }
+
+    $stringifiedItems = array_map(function ($key, $value) use ($depth) {
+        if (is_array($value)) {
+            return stringify($value, $depth + 1);
+        }
+        $indent = getIndent($depth + 2);
+
+        return "{$indent}{$key}: {$value}";
+    }, array_keys($value), $value);
+
+    $indent = fn($num) => str_repeat('    ', $num);
+
+    $result = ["{", ...$stringifiedItems, "{$indent($depth + 1)}}"];
+
+    return implode("\n", $result);
+}
+
+function getStrByStatus($node, $depth)
+{
+    $indent = getIndent($depth);
+
+    if ($node['status'] === 'changed') {
+        $deleted = $node['oldValue'];
+        $added = $node['newValue'];
+
+        if (is_array($deleted)) {
+            $deleted = stringify($deleted, $depth);
+        }
+
+        if (is_array($added)) {
+            $added = stringify($added, $depth);
+        }
+    } else {
+        $value = $node['value'];
+        if (is_array($value)) {
+            $value = stringify($value, $depth);
+        }
+    }
+
     switch ($node['status']) {
         case 'added':
-            return "  + {$node['key']}: {$node['value']}";
+            return "{$indent}  + {$node['name']}: {$value}";
         case 'removed':
-            return "  - {$node['key']}: {$node['value']}";
+            return "{$indent}  - {$node['name']}: {$value}";
         case 'unchanged':
-            return "    {$node['key']}: {$node['value']}";
+            return "{$indent}    {$node['name']}: {$value}";
         case 'changed':
-            return "  - {$node['key']}: {$node['value'][0]}\n  + {$node['key']}: {$node['value'][1]}";
+            return "{$indent}  - {$node['name']}: {$deleted}\n{$indent}  + {$node['name']}: {$added}";
         default:
             throw new \Exception('Invalid node status!');
     }
 }
 
-function render($data)
+function render($data, $depth = 0)
 {
-    $dataWithChangedBools = array_map(function ($node) {
-        if ($node['status'] === 'changed') {
-            return [
-                'key' => $node['key'],
-                'value' => [
-                    changeInvisibleTypes($node['value'][0]),
-                    changeInvisibleTypes($node['value'][1])
-                ],
-                'status' => $node['status']
-            ];
+    $indent = getIndent($depth);
+
+    $output = array_map(function ($node) use ($depth) {
+        if ($node['status'] === 'nested') {
+            $stringifiedArr = render($node['children'], $depth + 1);
+            $indent = fn($num) => str_repeat('    ', $num);
+            return "{$indent($depth + 1)}{$node['name']}: {$stringifiedArr}";
         }
 
-        return [
-            'key' => $node['key'],
-            'value' => changeInvisibleTypes($node['value']),
-            'status' => $node['status']
-        ];
+        return getStrByStatus($node, $depth);
     }, $data);
 
-    $output = array_map(fn($node) => getStrByStatus($node), $dataWithChangedBools);
-
-    $result = ["{", ...$output, "}\n"];
+    $result = ["{", ...$output, "{$indent}}"];
 
     return implode("\n", $result);
 }
