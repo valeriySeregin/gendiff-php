@@ -37,6 +37,7 @@
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "*",
-        "phpunit/phpunit": "^9.4"
+        "phpunit/phpunit": "^9.4",
+        "phpstan/phpstan": "^0.12.58"
     }
 }
