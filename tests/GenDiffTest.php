@@ -19,15 +19,16 @@ class GenDiffTest extends TestCase
         $argsWithYamlExt = [
             '<path/to/file1>' => __DIR__ . '/fixtures/before.yaml',
             '<path/to/file2>' => __DIR__ . '/fixtures/after.yaml',
-            '--format' => 'pretty'
+            '--format' => 'plain'
         ];
 
         $diffForJsonExt = getDiff($argsWithJsonExt);
         $diffForYamlExt = getDiff($argsWithYamlExt);
 
-        $expected = file_get_contents(__DIR__ . '/fixtures/expectedPretty.txt');
+        $expectedPretty = file_get_contents(__DIR__ . '/fixtures/expectedPretty.txt');
+        $expectedPlain = file_get_contents(__DIR__ . '/fixtures/expectedPlain.txt');
 
-        $this->assertEquals($diffForJsonExt, $expected);
-        $this->assertEquals($diffForYamlExt, $expected);
+        $this->assertEquals($diffForJsonExt, $expectedPretty);
+        $this->assertEquals($diffForYamlExt, $expectedPlain);
     }
 }
