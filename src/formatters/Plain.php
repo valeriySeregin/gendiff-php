@@ -2,12 +2,16 @@
 
 namespace App\Formatters\Plain;
 
+/**
+ * @param mixed $value
+ * @return string
+ */
 function stringify($value)
 {
     return is_array($value) ? '[complex value]' : $value;
 }
 
-function getStrByStatus($node, $propertyNames)
+function getStrByStatus(array $node, array $propertyNames): string
 {
     $name = implode('.', $propertyNames);
 
@@ -28,7 +32,7 @@ function getStrByStatus($node, $propertyNames)
     }
 }
 
-function render($data, $propertyNames = [])
+function render(array $data, array $propertyNames = []): string
 {
     $output = array_map(function ($node) use ($propertyNames) {
         if ($node['status'] === 'nested') {

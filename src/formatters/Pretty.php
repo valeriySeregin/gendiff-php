@@ -2,11 +2,16 @@
 
 namespace App\Formatters\Pretty;
 
-function getIndent($num)
+function getIndent(int $num): string
 {
     return str_repeat('    ', $num);
 }
 
+/**
+ * @param mixed $value
+ * @param int $depth
+ * @return string
+ */
 function stringify($value, $depth)
 {
     if (!is_array($value)) {
@@ -29,9 +34,13 @@ function stringify($value, $depth)
     return implode("\n", $result);
 }
 
-function getStrByStatus($node, $depth)
+function getStrByStatus(array $node, int $depth): string
 {
     $indent = getIndent($depth);
+
+    $value = '';
+    $deleted = '';
+    $added = '';
 
     if ($node['status'] === 'changed') {
         $deleted = $node['oldValue'];
@@ -65,6 +74,11 @@ function getStrByStatus($node, $depth)
     }
 }
 
+/**
+ * @param array $data
+ * @param int $depth
+ * @return string
+ */
 function render($data, $depth = 0)
 {
     $indent = getIndent($depth);

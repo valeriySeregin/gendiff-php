@@ -13,7 +13,7 @@ const PATH_TO_FIRST_FILE = '<path/to/file1>';
 const PATH_TO_SECOND_FILE = '<path/to/file2>';
 const FORMAT = '--format';
 
-function getDiff($args)
+function getDiff(array $args): string
 {
     $firstFilepath = $args[PATH_TO_FIRST_FILE];
     $secondFilepath = $args[PATH_TO_SECOND_FILE];
@@ -33,7 +33,7 @@ function getDiff($args)
     return "{$diff}\n";
 }
 
-function getDiffAst($firstFilepath, $secondFilepath)
+function getDiffAst(string $firstFilepath, string $secondFilepath): array
 {
     $parsers = [
         'json' => fn($json) => parseJson($json),
@@ -52,9 +52,13 @@ function getDiffAst($firstFilepath, $secondFilepath)
     return $ast;
 }
 
+/**
+ * @param string $filepath
+ * @return string|false
+ */
 function getFileContents($filepath)
 {
-    $absolutePath = realpath($filepath);
+    $absolutePath = (string) realpath($filepath);
     if (!file_exists($absolutePath)) {
         throw new \Exception('This file does not exist!');
     }
@@ -62,9 +66,7 @@ function getFileContents($filepath)
     return file_get_contents($filepath);
 }
 
-function getFileExtension($filepath)
+function getFileExtension(string $filepath): string
 {
-    $pathParts = pathinfo($filepath);
-
-    return $pathParts['extension'];
+    return pathinfo($filepath, PATHINFO_EXTENSION);
 }

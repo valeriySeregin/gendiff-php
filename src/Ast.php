@@ -2,6 +2,10 @@
 
 namespace App\Ast;
 
+/**
+ * @param mixed $value
+ * @return mixed
+ */
 function processUnprintableValues($value)
 {
     if (is_bool($value)) {
@@ -15,7 +19,7 @@ function processUnprintableValues($value)
     return $value;
 }
 
-function generateAst($arrBefore, $arrAfter)
+function generateAst(array $arrBefore, array $arrAfter): array
 {
     $unitedKeys = array_keys(array_merge($arrBefore, $arrAfter));
 
