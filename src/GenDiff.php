@@ -6,6 +6,7 @@ use function App\Parsers\JsonParser\parse as parseJson;
 use function App\Parsers\YamlParser\parse as parseYaml;
 use function App\Ast\generateAst;
 use function App\Formatters\Pretty\render as renderInPretty;
+use function App\Formatters\Plain\render as renderInPlain;
 
 const PATH_TO_FIRST_FILE = '<path/to/file1>';
 const PATH_TO_SECOND_FILE = '<path/to/file2>';
@@ -19,14 +20,15 @@ function getDiff($args)
     $diffAst = getDiffAst($firstFilepath, $secondFilepath);
 
     $formatters = [
-        'pretty' => fn($data) => renderInPretty($data)
+        'pretty' => fn($data) => renderInPretty($data),
+        'plain' => fn($data) => renderInPlain($data)
     ];
 
     $render = $formatters[$args[FORMAT]];
 
     $diff = $render($diffAst);
 
-    return $diff;
+    return "{$diff}\n";
 }
 
 function getDiffAst($firstFilepath, $secondFilepath)
