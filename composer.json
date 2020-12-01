@@ -20,7 +20,8 @@
             "src/parsers/YamlParser.php",
             "src/Ast.php",
             "src/formatters/Pretty.php",
-            "src/formatters/Plain.php"
+            "src/formatters/Plain.php",
+            "src/formatters/Json.php"
         ]
     },
     "authors": [
