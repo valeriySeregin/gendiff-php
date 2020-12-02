@@ -18,7 +18,7 @@ Compares two configuration files and shows a difference.
 Usage:
   gendiff (-h | --help)
   gendiff (-v | --version)
-  gendiff [options] <path/to/file1> <path/to/file2>
+  gendiff [options] <path/to/first/file> <path/to/second/file>
 
 Options:
   -h --help                  Show this screen.
@@ -33,6 +33,11 @@ Report formats:
 
 DOCOPT;
 
-$args = Docopt::handle($doc, array('version'=>'v0.1.0'));
-$diff = getDiff($args);
+$args = Docopt::handle($doc, array('version'=>'v0.3.0'));
+[
+    '<path/to/first/file>' => $pathToFirstFile,
+    '<path/to/second/file>' => $pathToSecondFile,
+    '--format' => $format
+] = $args;
+$diff = getDiff($pathToFirstFile, $pathToSecondFile, $format);
 print_r($diff);

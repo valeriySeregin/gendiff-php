@@ -4,30 +4,12 @@ namespace App;
 
 use function App\Parsers\parseData;
 use function App\Ast\generateAst;
-use function App\Formatters\Pretty\render as renderInPretty;
-use function App\Formatters\Plain\render as renderInPlain;
-use function App\Formatters\Json\render as renderInJson;
+use function App\Formatters\formatData;
 
-const PATH_TO_FIRST_FILE = '<path/to/file1>';
-const PATH_TO_SECOND_FILE = '<path/to/file2>';
-const FORMAT = '--format';
-
-function getDiff(array $args): string
+function getDiff(string $firstFilepath, string $secondFilepath, string $format): string
 {
-    $firstFilepath = $args[PATH_TO_FIRST_FILE];
-    $secondFilepath = $args[PATH_TO_SECOND_FILE];
-
     $diffAst = getDiffAst($firstFilepath, $secondFilepath);
-
-    $formatters = [
-        'pretty' => fn($data) => renderInPretty($data),
-        'plain' => fn($data) => renderInPlain($data),
-        'json' => fn($data) => renderInJson($data)
-    ];
-
-    $render = $formatters[$args[FORMAT]];
-
-    $diff = $render($diffAst);
+    $diff = formatData($diffAst, $format);
 
     return "{$diff}\n";
 }
