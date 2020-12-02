@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Parsers\YamlParser;
+namespace App\Parsers;
 
 use Symfony\Component\Yaml\Yaml;
 
-function parse(string $data): array
+function parseYaml(string $data): array
 {
     return Yaml::parse($data);
 }

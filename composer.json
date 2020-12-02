@@ -6,9 +6,6 @@
     "bin": [
         "bin/gendiff"
     ],
-    "scripts": {
-        "test": "phpunit tests"
-    },
     "autoload": {
         "psr-4": {
           "Php\\Package\\": "src",
@@ -16,12 +13,13 @@
         },
         "files": [
             "src/GenDiff.php",
-            "src/parsers/JsonParser.php",
-            "src/parsers/YamlParser.php",
+            "src/Parsers/JsonParser.php",
+            "src/Parsers/YamlParser.php",
+            "src/Parsers.php",
             "src/Ast.php",
-            "src/formatters/Pretty.php",
-            "src/formatters/Plain.php",
-            "src/formatters/Json.php"
+            "src/Formatters/Pretty.php",
+            "src/Formatters/Plain.php",
+            "src/Formatters/Json.php"
         ]
     },
     "authors": [

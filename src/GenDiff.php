@@ -2,8 +2,7 @@
 
 namespace App;
 
-use function App\Parsers\JsonParser\parse as parseJson;
-use function App\Parsers\YamlParser\parse as parseYaml;
+use function App\Parsers\parseData;
 use function App\Ast\generateAst;
 use function App\Formatters\Pretty\render as renderInPretty;
 use function App\Formatters\Plain\render as renderInPlain;
@@ -35,38 +34,23 @@ function getDiff(array $args): string
 
 function getDiffAst(string $firstFilepath, string $secondFilepath): array
 {
-    $parsers = [
-        'json' => fn($json) => parseJson($json),
-        'yaml' => fn($yaml) => parseYaml($yaml),
-        'yml' => fn($yaml) => parseYaml($yaml)
-    ];
+    $firstParserType = pathinfo($firstFilepath, PATHINFO_EXTENSION);
+    $secondParserType = pathinfo($secondFilepath, PATHINFO_EXTENSION);
 
-    $firstFileExt = getFileExtension($firstFilepath);
-    $secondFileExt = getFileExtension($secondFilepath);
-
-    $firstArr = $parsers[$firstFileExt](getFileContents($firstFilepath));
-    $secondArr = $parsers[$secondFileExt](getFileContents($secondFilepath));
+    $firstArr = parseData(getFileContents($firstFilepath), $firstParserType);
+    $secondArr = parseData(getFileContents($secondFilepath), $secondParserType);
 
     $ast = generateAst($firstArr, $secondArr);
 
     return $ast;
 }
 
-/**
- * @param string $filepath
- * @return string|false
- */
-function getFileContents($filepath)
+function getFileContents(string $filepath): string
 {
     $absolutePath = (string) realpath($filepath);
     if (!file_exists($absolutePath)) {
         throw new \Exception('This file does not exist!');
     }
 
-    return file_get_contents($filepath);
-}
-
-function getFileExtension(string $filepath): string
-{
-    return pathinfo($filepath, PATHINFO_EXTENSION);
+    return (string) file_get_contents($filepath);
 }
