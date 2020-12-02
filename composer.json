@@ -16,7 +16,6 @@
             "src/Parsers/JsonParser.php",
             "src/Parsers/YamlParser.php",
             "src/Parsers.php",
-            "src/Ast.php",
             "src/Formatters/Pretty.php",
             "src/Formatters/Plain.php",
             "src/Formatters/Json.php",
@@ -32,7 +31,8 @@
     "require": {
         "php": ">=7.4",
         "docopt/docopt": "^1.0",
-        "symfony/yaml": "^5.1"
+        "symfony/yaml": "^5.1",
+        "funct/funct": "^1.5"
     },
     "require-dev": {
         "squizlabs/php_codesniffer": "*",
