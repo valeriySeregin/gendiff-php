@@ -9,7 +9,7 @@ lint-fix:
 	composer exec --verbose phpcbf -- --standard=PSR12 bin src tests
 
 test:
-	composer exec --verbose phpunit tests
+	composer exec --verbose phpunit -- --testdox tests
 
 test-coverage:
 	composer exec --verbose phpunit tests -- --coverage-clover build/logs/clover.xml

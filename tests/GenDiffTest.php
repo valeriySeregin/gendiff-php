@@ -8,18 +8,77 @@ use function App\getDiff;
 
 class GenDiffTest extends TestCase
 {
-    public function testGetDiff(): void
+    private function makeFilepath(string $filename): string
     {
-        $diffForPrettyFormat = getDiff(__DIR__ . '/fixtures/before.json', __DIR__ . '/fixtures/after.json', 'pretty');
-        $diffForPlainFormat = getDiff(__DIR__ . '/fixtures/before.yaml', __DIR__ . '/fixtures/after.yaml', 'plain');
-        $diffForJsonFormat = getDiff(__DIR__ . '/fixtures/before.json', __DIR__ . '/fixtures/after.json', 'json');
+        $parts = [__DIR__, 'fixtures', $filename];
+        return implode(DIRECTORY_SEPARATOR, $parts);
+    }
 
-        $expectedPretty = file_get_contents(__DIR__ . '/fixtures/expectedPretty.txt');
-        $expectedPlain = file_get_contents(__DIR__ . '/fixtures/expectedPlain.txt');
-        $expectedJson = file_get_contents(__DIR__ . '/fixtures/expectedJson.txt');
+    /**
+     *
+     * @dataProvider defaultOutputProvider
+     */
+    public function testDefaultFormatOutput(string $filename1, string $filename2, string $expectedFilename): void
+    {
+        $expectedOutput = file_get_contents($this->makeFilepath($expectedFilename));
+        $this->assertSame($expectedOutput, getDiff($this->makeFilepath($filename1), $this->makeFilepath($filename2)));
+    }
 
-        $this->assertEquals($diffForPrettyFormat, $expectedPretty);
-        $this->assertEquals($diffForPlainFormat, $expectedPlain);
-        $this->assertEquals($diffForJsonFormat, $expectedJson);
+    /**
+     *
+     * @dataProvider differentFormatsProvider
+     */
+    public function testDifferentFormatOutputs(
+        string $filename1,
+        string $filename2,
+        string $format,
+        string $expectedFilename
+    ): void {
+        $expectedOutput = file_get_contents($this->makeFilepath($expectedFilename));
+        $this->assertSame($expectedOutput, getDiff(
+            $this->makeFilepath($filename1),
+            $this->makeFilepath($filename2),
+            $format
+        ));
+    }
+
+    public function defaultOutputProvider(): array
+    {
+        return [
+            'default output for json files' => [
+                'before.json',
+                'after.json',
+                'expectedPretty.txt'
+            ],
+            'default output for yaml files' => [
+                'before.yaml',
+                'after.yaml',
+                'expectedPretty.txt'
+            ]
+        ];
+    }
+
+    public function differentFormatsProvider(): array
+    {
+        return [
+            'pretty output' => [
+                'before.json',
+                'after.json',
+                'pretty',
+                'expectedPretty.txt'
+            ],
+            'plain output' => [
+                'before.json',
+                'after.json',
+                'plain',
+                'expectedPlain.txt'
+            ],
+            'json output' => [
+                'before.json',
+                'after.json',
+                'json',
+                'expectedJson.txt'
+            ]
+        ];
     }
 }
