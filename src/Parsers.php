@@ -1,9 +1,9 @@
 <?php
 
-namespace App\Parsers;
+namespace GenDiff\Parsers;
 
-use function App\Parsers\parseJson;
-use function App\Parsers\parseYaml;
+use function GenDiff\Parsers\parseJson;
+use function GenDiff\Parsers\parseYaml;
 
 function parseData(string $data, string $parserType): array
 {

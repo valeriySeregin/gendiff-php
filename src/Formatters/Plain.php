@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Formatters\Plain;
+namespace GenDiff\Formatters\Plain;
 
 /**
  * @param mixed $value

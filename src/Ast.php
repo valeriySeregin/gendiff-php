@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Ast;
+namespace GenDiff\Ast;
 
 /**
  * @param mixed $value

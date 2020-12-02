@@ -1,12 +1,12 @@
 <?php
 
-namespace App;
+namespace GenDiff;
 
-use function App\Parsers\parseData;
-use function App\Ast\generateAst;
-use function App\Formatters\formatData;
+use function GenDiff\Parsers\parseData;
+use function GenDiff\Ast\generateAst;
+use function GenDiff\Formatters\formatData;
 
-function getDiff(string $firstFilepath, string $secondFilepath, string $format = 'pretty'): string
+function genDiff(string $firstFilepath, string $secondFilepath, string $format = 'pretty'): string
 {
     $diffAst = getDiffAst($firstFilepath, $secondFilepath);
     $diff = formatData($diffAst, $format);

@@ -4,7 +4,7 @@ namespace Php\Package\Tests;
 
 use PHPUnit\Framework\TestCase;
 
-use function App\getDiff;
+use function GenDiff\genDiff;
 
 class GenDiffTest extends TestCase
 {
@@ -21,7 +21,7 @@ class GenDiffTest extends TestCase
     public function testDefaultFormatOutput(string $filename1, string $filename2, string $expectedFilename): void
     {
         $expectedOutput = file_get_contents($this->makeFilepath($expectedFilename));
-        $this->assertSame($expectedOutput, getDiff($this->makeFilepath($filename1), $this->makeFilepath($filename2)));
+        $this->assertSame($expectedOutput, genDiff($this->makeFilepath($filename1), $this->makeFilepath($filename2)));
     }
 
     /**
@@ -35,7 +35,7 @@ class GenDiffTest extends TestCase
         string $expectedFilename
     ): void {
         $expectedOutput = file_get_contents($this->makeFilepath($expectedFilename));
-        $this->assertSame($expectedOutput, getDiff(
+        $this->assertSame($expectedOutput, genDiff(
             $this->makeFilepath($filename1),
             $this->makeFilepath($filename2),
             $format

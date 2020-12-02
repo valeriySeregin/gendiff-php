@@ -1,10 +1,10 @@
 <?php
 
-namespace App\Formatters;
+namespace GenDiff\Formatters;
 
-use function App\Formatters\Pretty\render as renderInPretty;
-use function App\Formatters\Plain\render as renderInPlain;
-use function App\Formatters\Json\render as renderInJson;
+use function GenDiff\Formatters\Pretty\render as renderInPretty;
+use function GenDiff\Formatters\Plain\render as renderInPlain;
+use function GenDiff\Formatters\Json\render as renderInJson;
 
 function formatData(array $data, string $format): string
 {

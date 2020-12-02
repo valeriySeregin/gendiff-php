@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Formatters\Pretty;
+namespace GenDiff\Formatters\Pretty;
 
 function getIndent(int $num): string
 {
