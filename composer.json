@@ -12,7 +12,7 @@
           "Php\\Package\\Tests\\": "tests"
         },
         "files": [
-            "src/GenDiff.php",
+            "src/DiffGenerator.php",
             "src/Parsers/JsonParser.php",
             "src/Parsers/YamlParser.php",
             "src/Parsers.php",

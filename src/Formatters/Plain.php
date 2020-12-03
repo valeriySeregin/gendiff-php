@@ -15,7 +15,7 @@ function getStrByStatus(array $node, array $propertyNames): string
 {
     $name = implode('.', $propertyNames);
 
-    switch ($node['status']) {
+    switch ($node['state']) {
         case 'added':
             $value = stringify($node['value']);
             return "Property '{$name}' was added with value: '{$value}'";
@@ -35,7 +35,7 @@ function getStrByStatus(array $node, array $propertyNames): string
 function render(array $data, array $propertyNames = []): string
 {
     $output = array_map(function ($node) use ($propertyNames) {
-        if ($node['status'] === 'nested') {
+        if ($node['state'] === 'nested') {
             return render($node['children'], [...$propertyNames, $node['name']]);
         }
 

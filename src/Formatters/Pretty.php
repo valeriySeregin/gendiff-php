@@ -42,7 +42,7 @@ function getStrByStatus(array $node, int $depth): string
     $deleted = '';
     $added = '';
 
-    if ($node['status'] === 'changed') {
+    if ($node['state'] === 'changed') {
         $deleted = $node['oldValue'];
         $added = $node['newValue'];
 
@@ -60,7 +60,7 @@ function getStrByStatus(array $node, int $depth): string
         }
     }
 
-    switch ($node['status']) {
+    switch ($node['state']) {
         case 'added':
             return "{$indent}  + {$node['name']}: {$value}";
         case 'removed':
@@ -84,7 +84,7 @@ function render($data, $depth = 0)
     $indent = getIndent($depth);
 
     $output = array_map(function ($node) use ($depth) {
-        if ($node['status'] === 'nested') {
+        if ($node['state'] === 'nested') {
             $stringifiedArr = render($node['children'], $depth + 1);
             $indent = fn($num) => str_repeat('    ', $num);
             return "{$indent($depth + 1)}{$node['name']}: {$stringifiedArr}";
