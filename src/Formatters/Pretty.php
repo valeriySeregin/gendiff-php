@@ -2,9 +2,11 @@
 
 namespace GenDiff\Formatters\Pretty;
 
+const INDENT_LENGTH = 4;
+
 function getIndent(int $num): string
 {
-    return str_repeat('    ', $num);
+    return str_repeat(' ', INDENT_LENGTH * $num);
 }
 
 /**
@@ -14,86 +16,65 @@ function getIndent(int $num): string
  */
 function stringify($value, $depth)
 {
-    if (!is_array($value)) {
-        return $value;
-    }
+    $stringifyComplexValue = function ($value, $depth) {
+        $indent = getIndent($depth);
+        $complexValue = array_map(function ($key, $value) use ($indent) {
+            return "{$indent}    {$key}: {$value}";
+        }, array_keys($value), $value);
 
-    $stringifiedItems = array_map(function ($key, $value) use ($depth) {
-        if (is_array($value)) {
-            return stringify($value, $depth + 1);
-        }
-        $indent = getIndent($depth + 2);
+        return implode("\n", ["{", ...$complexValue, "{$indent}}"]);
+    };
 
-        return "{$indent}{$key}: {$value}";
-    }, array_keys($value), $value);
+    $typeFormats = [
+        'string' => fn($value) => $value,
+        'integer' => fn($value) => (string) $value,
+        'object' => fn($value) => $stringifyComplexValue(get_object_vars($value), $depth + 1),
+        'array' => fn($value) => $stringifyComplexValue($value, $depth + 1),
+        'boolean' => fn($value) => $value ? "true" : "false",
+        'NULL' => fn($value) => 'null'
+    ];
 
-    $indent = fn($num) => str_repeat('    ', $num);
+    $type = gettype($value);
 
-    $result = ["{", ...$stringifiedItems, "{$indent($depth + 1)}}"];
-
-    return implode("\n", $result);
+    return $typeFormats[$type]($value);
 }
 
-function getStrByStatus(array $node, int $depth): string
+function generatePrettyOutput(array $tree, int $depth = 0): string
 {
     $indent = getIndent($depth);
+    $output = array_map(function ($node) use ($depth, $indent) {
+        switch ($node['state']) {
+            case 'added':
+                $formattedValue = stringify($node['value'], $depth);
+                return "{$indent}  + {$node['name']}: {$formattedValue}";
 
-    $value = '';
-    $deleted = '';
-    $added = '';
+            case 'removed':
+                $formattedValue = stringify($node['value'], $depth);
+                return "{$indent}  - {$node['name']}: {$formattedValue}";
 
-    if ($node['state'] === 'changed') {
-        $deleted = $node['oldValue'];
-        $added = $node['newValue'];
+            case 'unchanged':
+                $formattedValue = stringify($node['value'], $depth);
+                return "{$indent}    {$node['name']}: {$formattedValue}";
 
-        if (is_array($deleted)) {
-            $deleted = stringify($deleted, $depth);
+            case 'changed':
+                $deleted = stringify($node['oldValue'], $depth);
+                $added = stringify($node['newValue'], $depth);
+                return "{$indent}  - {$node['name']}: {$deleted}\n{$indent}  + {$node['name']}: {$added}";
+
+            case 'nested':
+                $prettyOutput = generatePrettyOutput($node['children'], $depth + 1);
+                $indent = getIndent($depth + 1);
+                return "{$indent}{$node['name']}: {$prettyOutput}";
+
+            default:
+                throw new \Exception('Invalid node status!');
         }
+    }, $tree);
 
-        if (is_array($added)) {
-            $added = stringify($added, $depth);
-        }
-    } else {
-        $value = $node['value'];
-        if (is_array($value)) {
-            $value = stringify($value, $depth);
-        }
-    }
-
-    switch ($node['state']) {
-        case 'added':
-            return "{$indent}  + {$node['name']}: {$value}";
-        case 'removed':
-            return "{$indent}  - {$node['name']}: {$value}";
-        case 'unchanged':
-            return "{$indent}    {$node['name']}: {$value}";
-        case 'changed':
-            return "{$indent}  - {$node['name']}: {$deleted}\n{$indent}  + {$node['name']}: {$added}";
-        default:
-            throw new \Exception('Invalid node status!');
-    }
+    return implode("\n", ["{", ...$output, "{$indent}}"]);
 }
 
-/**
- * @param array $data
- * @param int $depth
- * @return string
- */
-function render($data, $depth = 0)
+function render(array $tree): string
 {
-    $indent = getIndent($depth);
-
-    $output = array_map(function ($node) use ($depth) {
-        if ($node['state'] === 'nested') {
-            $stringifiedArr = render($node['children'], $depth + 1);
-            $indent = fn($num) => str_repeat('    ', $num);
-            return "{$indent($depth + 1)}{$node['name']}: {$stringifiedArr}";
-        }
-
-        return getStrByStatus($node, $depth);
-    }, $data);
-
-    $result = ["{", ...$output, "{$indent}}"];
-
-    return implode("\n", $result);
+    return generatePrettyOutput($tree);
 }
