@@ -5,7 +5,7 @@ namespace GenDiff\Parsers;
 use function GenDiff\Parsers\parseJson;
 use function GenDiff\Parsers\parseYaml;
 
-function parseData(string $data, string $parserType): array
+function parseData(string $data, string $parserType): object
 {
     $parsers = [
         'json' => fn($data) => parseJson($data),
