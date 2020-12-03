@@ -15,7 +15,7 @@
             },
             {
                 "name": "setting3",
-                "oldValue": "true",
+                "oldValue": true,
                 "newValue": {
                     "key": "value"
                 },
@@ -39,7 +39,7 @@
             },
             {
                 "name": "follow",
-                "value": "false",
+                "value": false,
                 "state": "added"
             },
             {
