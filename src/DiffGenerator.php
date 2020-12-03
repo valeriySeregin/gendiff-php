@@ -33,68 +33,62 @@ function read(string $filepath): string
     return (string) file_get_contents($absoluteFilepath);
 }
 
-/**
- * @param mixed $value
- * @return mixed
- */
-function processUnprintableValues($value)
+function generateDiffTree(object $dataBefore, object $dataAfter): array
 {
-    if (is_bool($value)) {
-        return $value === true ? 'true' : 'false';
-    }
-
-    if (is_null($value)) {
-        return 'null';
-    }
-
-    return $value;
-}
-
-function generateDiffTree(array $dataBefore, array $dataAfter): array
-{
-    $unitedKeys = union(array_keys($dataBefore), array_keys($dataAfter));
+    $unitedKeys = union(array_keys(get_object_vars($dataBefore)), array_keys(get_object_vars($dataAfter)));
 
     return array_map(function ($key) use ($dataBefore, $dataAfter) {
-        if (!array_key_exists($key, $dataBefore)) {
-            return [
-                'name' => $key,
-                'value' => processUnprintableValues($dataAfter[$key]),
-                'state' => 'added'
-            ];
+        if (!property_exists($dataBefore, $key)) {
+            return makeNode($key, 'added', $dataAfter->$key);
         }
 
-        if (!array_key_exists($key, $dataAfter)) {
-            return [
-                'name' => $key,
-                'value' => processUnprintableValues($dataBefore[$key]),
-                'state' => 'removed'
-            ];
+        if (!property_exists($dataAfter, $key)) {
+            return makeNode($key, 'removed', $dataBefore->$key);
         }
 
-        if (
-            (isset($dataBefore[$key]) && is_array($dataBefore[$key]))
-            && (isset($dataAfter[$key]) && is_array($dataAfter[$key]))
-        ) {
-            return [
-                'name' => $key,
-                'state' => 'nested',
-                'children' => generateDiffTree($dataBefore[$key], $dataAfter[$key])
-            ];
+        if (is_object($dataBefore->$key) && is_object($dataAfter->$key)) {
+            return makeNode($key, 'nested', null, null, generateDiffTree($dataBefore->$key, $dataAfter->$key));
         }
 
-        if ($dataBefore[$key] === $dataAfter[$key]) {
-            return [
-                'name' => $key,
-                'value' => processUnprintableValues($dataBefore[$key]),
-                'state' => 'unchanged'
-            ];
+        if ($dataBefore->$key === $dataAfter->$key) {
+            return makeNode($key, 'unchanged', $dataBefore->$key);
         }
 
-        return [
-            'name' => $key,
-            'oldValue' => processUnprintableValues($dataBefore[$key]),
-            'newValue' => processUnprintableValues($dataAfter[$key]),
-            'state' => 'changed'
-        ];
+        return makeNode($key, 'changed', $dataAfter->$key, $dataBefore->$key);
     }, array_values($unitedKeys));
+}
+
+/**
+ * @param string $name
+ * @param string $state
+ * @param object|string|array $newValue
+ * @param object|string|array $oldValue
+ * @param array $children
+ * @return array
+ */
+function makeNode($name, $state, $newValue = null, $oldValue = null, $children = null)
+{
+    $complexStates = [
+        'changed' => fn($name, $state, $newValue, $oldValue, $children) => [
+            'name' => $name,
+            'oldValue' => $oldValue,
+            'newValue' => $newValue,
+            'state' => $state
+        ],
+        'nested' => fn($name, $state, $newValue, $oldValue, $children) => [
+            'name' => $name,
+            'state' => $state,
+            'children' => $children
+        ]
+    ];
+
+    if (array_key_exists($state, $complexStates)) {
+        return $complexStates[$state]($name, $state, $newValue, $oldValue, $children);
+    }
+
+    return [
+        'name' => $name,
+        'value' => $newValue,
+        'state' => $state
+    ];
 }
