@@ -2,45 +2,61 @@
 
 namespace GenDiff\Formatters\Plain;
 
+use function Funct\Collection\flattenAll;
+
 /**
  * @param mixed $value
  * @return string
  */
 function stringify($value)
 {
-    return is_array($value) ? '[complex value]' : $value;
+    $typeFormats = [
+        'string' => fn($value) => $value,
+        'integer' => fn($value) => (string) $value,
+        'object' => fn($value) => '[complex value]',
+        'array' => fn($value) => '[complex value]',
+        'boolean' => fn($value) => $value ? 'true' : 'false',
+        'NULL' => fn($value) => 'null'
+    ];
+
+    $type = gettype($value);
+
+    return $typeFormats[$type]($value);
 }
 
-function getStrByStatus(array $node, array $propertyNames): string
+function generatePlainOutput(array $tree, array $propertyNames): array
 {
-    $name = implode('.', $propertyNames);
+    $output = array_map(function ($child) use ($propertyNames) {
+        $name = implode('.', [...$propertyNames, $child['name']]);
 
-    switch ($node['state']) {
-        case 'added':
-            $value = stringify($node['value']);
-            return "Property '{$name}' was added with value: '{$value}'";
-        case 'removed':
-            return "Property '{$name}' was removed";
-        case 'unchanged':
-            return "Property '{$name}' was not changed";
-        case 'changed':
-            $oldValue = stringify($node['oldValue']);
-            $newValue = stringify($node['newValue']);
-            return "Property '{$name}' was updated. From '{$oldValue}' to '{$newValue}'";
-        default:
-            throw new \Exception('Invalid node status!');
-    }
-}
+        switch ($child['state']) {
+            case 'added':
+                $value = stringify($child['value']);
+                return "Property '{$name}' was added with value: '{$value}'";
 
-function render(array $data, array $propertyNames = []): string
-{
-    $output = array_map(function ($node) use ($propertyNames) {
-        if ($node['state'] === 'nested') {
-            return render($node['children'], [...$propertyNames, $node['name']]);
+            case 'removed':
+                return "Property '{$name}' was removed";
+
+            case 'unchanged':
+                return "Property '{$name}' was not changed";
+
+            case 'changed':
+                $oldValue = stringify($child['oldValue']);
+                $newValue = stringify($child['newValue']);
+                return "Property '{$name}' was updated. From '{$oldValue}' to '{$newValue}'";
+
+            case 'nested':
+                return generatePlainOutput($child['children'], [...$propertyNames, $child['name']]);
+
+            default:
+                throw new \Exception("Invalid node state: {$child['state']}");
         }
+    }, $tree);
 
-        return getStrByStatus($node, [...$propertyNames, $node['name']]);
-    }, $data);
+    return flattenAll($output);
+}
 
-    return implode("\n", $output);
+function render(array $data): string
+{
+    return implode("\n", generatePlainOutput($data, []));
 }
