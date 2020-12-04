@@ -33,7 +33,7 @@ Report formats:
 
 DOCOPT;
 
-$args = Docopt::handle($doc, array('version'=>'v0.3.0'));
+$args = Docopt::handle($doc, array('version'=>'v1.0.0'));
 [
     '<path/to/first/file>' => $pathToFirstFile,
     '<path/to/second/file>' => $pathToSecondFile,
